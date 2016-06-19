@@ -1,55 +1,15 @@
-/// Problem to solve:
-/// Given a list of numbers and new values of each number. Each time, only one
-/// non zero delta can be applied to a non empty subset of continuous members of
-/// the list. The delta needs to minimize the gap between current value and new
-/// value for each number applied, while not creating new gap for any member.
-
-/// Solution:
-/// Data Structure:
-/// To have easier way to find corresponding number pair, group the initial and
-/// target together and form a new list. To know the whole transform clearly,
-/// record all changes (including zeros) for each step. Append each step's
-/// change after the initial. To clearly identify the target and each step's
-/// number, a dictionary with target as key and an array of number as value is a
-/// good structure to group them. Two lists of numbers transform to be a list of
-/// dictionaries.
-/// Calculation:
-/// Find out all continuous non-zero-delta-to-reach-target ranges for current
-/// numbers. Get max delta necessary for each number in the range for each
-/// range. Follow a rule provided to pick the range to operate on. Execute and
-/// loop the process till no non-zero-delta-to-reach-target range can be found.
-
-/// List of targets, not going to change.
-/// List of range and its delta, appended in each step.
-/// List of updated numbers, new list after each step.
-
-/// Base data structure is a list of targets. Each time a list of updated values
-/// is applied to it to get answers.
-
-/// max-deltas: means, in a continuous range, the max delta that all its
-/// members can be added in the progress of reaching each's target, but not
-/// over-reaching for any member.
-
 /// Written in Swift 2.2.
 
-protocol Numberable: Comparable, Hashable {
+import UIKit
+
+protocol Numberable: Comparable {
     func +(lhs: Self, rhs: Self) -> Self
     func -(lhs: Self, rhs: Self) -> Self
     func *(lhs: Self, rhs: Self) -> Self
     func /(lhs: Self, rhs: Self) -> Self
     func %(lhs: Self, rhs: Self) -> Self
-    /// Zero value of the type.
-    var zero: Self { get }
 }
 
-extension Numberable {
-    var zero: Self {
-        return self - self
-    }
-}
-
-extension Double: Numberable {}
-extension Float: Numberable {}
 extension Int: Numberable {}
 extension Int8: Numberable {}
 extension Int16: Numberable {}
@@ -60,6 +20,7 @@ extension UInt8: Numberable {}
 extension UInt16: Numberable {}
 extension UInt32: Numberable {}
 extension UInt64: Numberable {}
+
 
 extension Range {
     /// Returns the corresponding positions of start and end indice of
@@ -166,9 +127,9 @@ extension CollectionType where Generator.Element : Numberable, Generator.Element
                 guard let deltaAtPosition = delta else {
                     fatalError("func nonZeroMaxDeltaRangesAndDeltas came up with invalid deltas.")
                 }
-                if deltaAtPosition != deltaAtPosition.zero {
+                if deltaAtPosition != deltaAtPosition - deltaAtPosition {
                     if let _ = headIndex, deltaForRangeHere = deltaForRange {
-                        if deltaForRangeHere * deltaAtPosition < deltaAtPosition.zero {
+                        if deltaForRangeHere * deltaAtPosition < deltaAtPosition - deltaAtPosition {
                             newPieceReady = true
                         }
                     }
@@ -176,7 +137,7 @@ extension CollectionType where Generator.Element : Numberable, Generator.Element
                         headIndex = i
                     }
                     if !newPieceReady {
-                        deltaForRange = (deltaForRange == nil) ? deltaAtPosition : (deltaAtPosition > deltaAtPosition.zero ? min(deltaForRange!, deltaAtPosition) : max(deltaForRange!, deltaAtPosition))
+                        deltaForRange = (deltaForRange == nil) ? deltaAtPosition : (deltaAtPosition > deltaAtPosition - deltaAtPosition ? min(deltaForRange!, deltaAtPosition) : max(deltaForRange!, deltaAtPosition))
                     }
                 }
                 else {
@@ -191,7 +152,7 @@ extension CollectionType where Generator.Element : Numberable, Generator.Element
                 tailIndex = nil
                 deltaForRange = nil
                 if let d = delta {
-                    if d != d.zero {
+                    if d != d - d {
                         headIndex = i
                         deltaForRange = d
                     }
@@ -206,9 +167,9 @@ extension CollectionType where Generator.Element : Numberable, Generator.Element
     func apply(delta: Generator.Element, to range: Range<Index>) -> [Generator.Element]? {
         if startIndex.distanceTo(range.startIndex) < 0 || endIndex.distanceTo(range.endIndex) > 0 { return nil }
         var deltas: [Generator.Element] = []
-        deltas.appendContentsOf(Repeat(count: ((startIndex..<range.startIndex).count as! Int), repeatedValue: delta.zero))
+        deltas.appendContentsOf(Repeat(count: ((startIndex..<range.startIndex).count as! Int), repeatedValue: delta - delta))
         deltas.appendContentsOf(Repeat(count: ((range.startIndex..<range.endIndex).count as! Int), repeatedValue: delta))
-        deltas.appendContentsOf(Repeat(count: ((range.endIndex..<endIndex).count as! Int), repeatedValue: delta.zero))
+        deltas.appendContentsOf(Repeat(count: ((range.endIndex..<endIndex).count as! Int), repeatedValue: delta - delta))
         var newNumbers: [Generator.Element] = []
         var deltasGen = deltas.generate()
         for number in self {
@@ -366,3 +327,76 @@ let toTarget3 = normalTargetArray.deltasAndRangesWithNewArrays(from: normalIniti
 /// step: 9
 /// newCollection: [42, 321, 53, 532, 12, 8, 2123, 2, 12341, 653, 1, 4]
 /// options: []
+
+
+protocol AccuracyTolerable: Numberable {
+    func isEqual(to another: Self) -> Bool
+    func isGreater(than another: Self) -> Bool
+    func isLess(than aother: Self) -> Bool
+}
+
+struct AccuracyTolerance {
+    let forDoubleUpper: Double
+    let forDoubleLower: Double
+    let forFloatUpper: Float
+    let forFloatLower: Float
+    let forCGFloatUpper: CGFloat
+    let forCGFloatLower: CGFloat
+}
+
+let accuracy = AccuracyTolerance(
+    forDoubleUpper: 0.000001,
+    forDoubleLower: -0.000001,
+    forFloatUpper: 0.000001,
+    forFloatLower: -0.000001,
+    forCGFloatUpper: 0.000001,
+    forCGFloatLower: -0.000001)
+
+extension AccuracyTolerable {
+    /// Returns if 'self' == 'another'.
+    @warn_unused_result
+    func isEqual(to another: Self) -> Bool {
+        switch another - self {
+        case let delta as Double:
+            return delta <= accuracy.forDoubleUpper && delta >= accuracy.forDoubleLower
+        case let delta as Float:
+            return delta <= accuracy.forFloatUpper && delta >= accuracy.forFloatLower
+        case let delta as CGFloat:
+            return delta <= accuracy.forCGFloatUpper && delta >= accuracy.forCGFloatLower
+        default:
+            fatalError("type is not implemented for AccuracyTolerable.")
+        }
+    }
+    /// Returns if 'self' > self.
+    @warn_unused_result
+    func isGreater(than another: Self) -> Bool {
+        switch self - another {
+        case let delta as Double:
+            return delta > accuracy.forDoubleUpper
+        case let delta as Float:
+            return delta > accuracy.forFloatUpper
+        case let delta as CGFloat:
+            return delta > accuracy.forCGFloatUpper
+        default:
+            fatalError("type is not implemented for AccuracyTolerable.")
+        }
+    }
+    /// Returns if 'self' < 'another'.
+    @warn_unused_result
+    func isLess(than another: Self) -> Bool {
+        switch self - another {
+        case let delta as Double:
+            return delta < accuracy.forDoubleLower
+        case let delta as Float:
+            return delta < accuracy.forFloatLower
+        case let delta as CGFloat:
+            return delta < accuracy.forCGFloatLower
+        default:
+            fatalError("type is not implemented for AccuracyTolerable.")
+        }
+    }
+}
+
+extension Double: AccuracyTolerable {}
+extension Float: AccuracyTolerable {}
+extension CGFloat: AccuracyTolerable {}
