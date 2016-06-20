@@ -5,6 +5,26 @@ A model written in Swift to solve a problem I came across.
 
 Given a list of numbers and another list of new value for each number. Each time, only one non zero delta can be applied to a non empty subset of continuous members of the list. The delta needs to minimize the gap between current value and new value for each number applied, while not creating new gap for any member.
 
+>Example:
+
+>[1, 6, 4, 2] => [0, 2, -1, 4]
+
+>Step0: delta = -1, range = 0..<1
+
+>After Step0: [0, 6, 4, 2]
+
+>Step1: delta = -4, range = 1..<3
+
+>After Step1: [0, 2, 0, 2]
+
+>Step2: delta = -1, range = 2..<3
+
+>After Step2: [0, 2, -1, 2]
+
+>Step3: delta = 2, range = 3..<4
+
+>After Step3: [0, 2, -1, 4]
+
 ## Solution
 
 ### Data Structure
