@@ -2,26 +2,6 @@
 
 import UIKit
 
-protocol Numberable: Comparable {
-    func +(lhs: Self, rhs: Self) -> Self
-    func -(lhs: Self, rhs: Self) -> Self
-    func *(lhs: Self, rhs: Self) -> Self
-    func /(lhs: Self, rhs: Self) -> Self
-    func %(lhs: Self, rhs: Self) -> Self
-}
-
-extension Int: Numberable {}
-extension Int8: Numberable {}
-extension Int16: Numberable {}
-extension Int32: Numberable {}
-extension Int64: Numberable {}
-extension UInt: Numberable {}
-extension UInt8: Numberable {}
-extension UInt16: Numberable {}
-extension UInt32: Numberable {}
-extension UInt64: Numberable {}
-
-
 extension Range {
     /// Returns the corresponding positions of start and end indice of
     /// 'rangeInSelf' in 'anotherRange'.
@@ -79,8 +59,7 @@ let range5 = rangeB.range(in: rangeB, for: 150..<150)
 /// Returns 'nil'.
 let range6 = rangeB.range(in: rangeB, for: 0..<0)
 
-
-extension CollectionType where Generator.Element : Numberable, Generator.Element == SubSequence.Generator.Element {
+extension CollectionType where Generator.Element : IntegerArithmeticType, Generator.Element == SubSequence.Generator.Element {
     /// For each element in 'self', get the delta from the corresponding one in
     /// 'from' and return as an 'Array'.
     /// Returns 'nil', if any elemnt in either arrays is missing.
@@ -236,7 +215,7 @@ let applied3 = arrayH.apply(50, to: 2..<7)
 /// Returns 'nil'.
 let applied4 = arrayH.apply(50, to: -1..<7)
 
-extension Array where Element : Numberable {
+extension Array where Element : IntegerArithmeticType {
     /// Returns all deltas, ranges applied and new arrays generated to reach
     /// self.
     /// Returns 'nil', if there is no corresponding element in either array or
@@ -329,74 +308,74 @@ let toTarget3 = normalTargetArray.deltasAndRangesWithNewArrays(from: normalIniti
 /// options: []
 
 
-protocol AccuracyTolerable: Numberable {
-    func isEqual(to another: Self) -> Bool
-    func isGreater(than another: Self) -> Bool
-    func isLess(than aother: Self) -> Bool
-}
-
-struct AccuracyTolerance {
-    let forDoubleUpper: Double
-    let forDoubleLower: Double
-    let forFloatUpper: Float
-    let forFloatLower: Float
-    let forCGFloatUpper: CGFloat
-    let forCGFloatLower: CGFloat
-}
-
-let accuracy = AccuracyTolerance(
-    forDoubleUpper: 0.000001,
-    forDoubleLower: -0.000001,
-    forFloatUpper: 0.000001,
-    forFloatLower: -0.000001,
-    forCGFloatUpper: 0.000001,
-    forCGFloatLower: -0.000001)
-
-extension AccuracyTolerable {
-    /// Returns if 'self' == 'another'.
-    @warn_unused_result
-    func isEqual(to another: Self) -> Bool {
-        switch another - self {
-        case let delta as Double:
-            return delta <= accuracy.forDoubleUpper && delta >= accuracy.forDoubleLower
-        case let delta as Float:
-            return delta <= accuracy.forFloatUpper && delta >= accuracy.forFloatLower
-        case let delta as CGFloat:
-            return delta <= accuracy.forCGFloatUpper && delta >= accuracy.forCGFloatLower
-        default:
-            fatalError("type is not implemented for AccuracyTolerable.")
-        }
-    }
-    /// Returns if 'self' > self.
-    @warn_unused_result
-    func isGreater(than another: Self) -> Bool {
-        switch self - another {
-        case let delta as Double:
-            return delta > accuracy.forDoubleUpper
-        case let delta as Float:
-            return delta > accuracy.forFloatUpper
-        case let delta as CGFloat:
-            return delta > accuracy.forCGFloatUpper
-        default:
-            fatalError("type is not implemented for AccuracyTolerable.")
-        }
-    }
-    /// Returns if 'self' < 'another'.
-    @warn_unused_result
-    func isLess(than another: Self) -> Bool {
-        switch self - another {
-        case let delta as Double:
-            return delta < accuracy.forDoubleLower
-        case let delta as Float:
-            return delta < accuracy.forFloatLower
-        case let delta as CGFloat:
-            return delta < accuracy.forCGFloatLower
-        default:
-            fatalError("type is not implemented for AccuracyTolerable.")
-        }
-    }
-}
-
-extension Double: AccuracyTolerable {}
-extension Float: AccuracyTolerable {}
-extension CGFloat: AccuracyTolerable {}
+//protocol AccuracyTolerable: Numberable {
+//    func isEqual(to another: Self) -> Bool
+//    func isGreater(than another: Self) -> Bool
+//    func isLess(than aother: Self) -> Bool
+//}
+//
+//struct AccuracyTolerance {
+//    let forDoubleUpper: Double
+//    let forDoubleLower: Double
+//    let forFloatUpper: Float
+//    let forFloatLower: Float
+//    let forCGFloatUpper: CGFloat
+//    let forCGFloatLower: CGFloat
+//}
+//
+//let accuracy = AccuracyTolerance(
+//    forDoubleUpper: 0.000001,
+//    forDoubleLower: -0.000001,
+//    forFloatUpper: 0.000001,
+//    forFloatLower: -0.000001,
+//    forCGFloatUpper: 0.000001,
+//    forCGFloatLower: -0.000001)
+//
+//extension AccuracyTolerable {
+//    /// Returns if 'self' == 'another'.
+//    @warn_unused_result
+//    func isEqual(to another: Self) -> Bool {
+//        switch another - self {
+//        case let delta as Double:
+//            return delta <= accuracy.forDoubleUpper && delta >= accuracy.forDoubleLower
+//        case let delta as Float:
+//            return delta <= accuracy.forFloatUpper && delta >= accuracy.forFloatLower
+//        case let delta as CGFloat:
+//            return delta <= accuracy.forCGFloatUpper && delta >= accuracy.forCGFloatLower
+//        default:
+//            fatalError("type is not implemented for AccuracyTolerable.")
+//        }
+//    }
+//    /// Returns if 'self' > self.
+//    @warn_unused_result
+//    func isGreater(than another: Self) -> Bool {
+//        switch self - another {
+//        case let delta as Double:
+//            return delta > accuracy.forDoubleUpper
+//        case let delta as Float:
+//            return delta > accuracy.forFloatUpper
+//        case let delta as CGFloat:
+//            return delta > accuracy.forCGFloatUpper
+//        default:
+//            fatalError("type is not implemented for AccuracyTolerable.")
+//        }
+//    }
+//    /// Returns if 'self' < 'another'.
+//    @warn_unused_result
+//    func isLess(than another: Self) -> Bool {
+//        switch self - another {
+//        case let delta as Double:
+//            return delta < accuracy.forDoubleLower
+//        case let delta as Float:
+//            return delta < accuracy.forFloatLower
+//        case let delta as CGFloat:
+//            return delta < accuracy.forCGFloatLower
+//        default:
+//            fatalError("type is not implemented for AccuracyTolerable.")
+//        }
+//    }
+//}
+//
+//extension Double: AccuracyTolerable {}
+//extension Float: AccuracyTolerable {}
+//extension CGFloat: AccuracyTolerable {}
