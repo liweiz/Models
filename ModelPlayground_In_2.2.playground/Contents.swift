@@ -89,6 +89,8 @@ extension CollectionType where Generator.Element : IntegerArithmeticType, Genera
     func nonZeroMaxDeltaRangesAndDeltas<T : CollectionType where T.Generator.Element == Self.Generator.Element, T.Generator.Element == T.SubSequence.Generator.Element>(from collection: T) -> [(Range<Index>, Generator.Element)]? {
         guard let deltas = deltas(from: collection) else { return nil }
         var results: [(Range<Index>, Generator.Element)] = []
+        if deltas.count == 0 { return results }
+        let zero = deltas.first! - deltas.first!
         var headIndex: Index?
         var tailIndex: Index?
         var deltasGen = deltas.generate()
@@ -98,25 +100,21 @@ extension CollectionType where Generator.Element : IntegerArithmeticType, Genera
             var newPieceReady = false
             let delta = deltasGen.next()
             if i == endIndex {
-                if let _ = headIndex {
-                    newPieceReady = true
-                }
+                if headIndex != nil { newPieceReady = true }
             }
             else {
                 guard let deltaAtPosition = delta else {
                     fatalError("func nonZeroMaxDeltaRangesAndDeltas came up with invalid deltas.")
                 }
-                if deltaAtPosition != deltaAtPosition - deltaAtPosition {
+                if deltaAtPosition != zero {
                     if let _ = headIndex, deltaForRangeHere = deltaForRange {
-                        if deltaForRangeHere * deltaAtPosition < deltaAtPosition - deltaAtPosition {
-                            newPieceReady = true
-                        }
+                        if deltaForRangeHere * deltaAtPosition < zero { newPieceReady = true }
                     }
                     else {
                         headIndex = i
                     }
                     if !newPieceReady {
-                        deltaForRange = (deltaForRange == nil) ? deltaAtPosition : (deltaAtPosition > deltaAtPosition - deltaAtPosition ? min(deltaForRange!, deltaAtPosition) : max(deltaForRange!, deltaAtPosition))
+                        deltaForRange = (deltaForRange == nil) ? deltaAtPosition : (deltaAtPosition > zero ? min(deltaForRange!, deltaAtPosition) : max(deltaForRange!, deltaAtPosition))
                     }
                 }
                 else {
@@ -130,11 +128,9 @@ extension CollectionType where Generator.Element : IntegerArithmeticType, Genera
                 headIndex = nil
                 tailIndex = nil
                 deltaForRange = nil
-                if let d = delta {
-                    if d != d - d {
-                        headIndex = i
-                        deltaForRange = d
-                    }
+                if delta != nil && delta! != zero {
+                    headIndex = i
+                    deltaForRange = delta
                 }
             }
         }
@@ -146,9 +142,10 @@ extension CollectionType where Generator.Element : IntegerArithmeticType, Genera
     func apply(delta: Generator.Element, to range: Range<Index>) -> [Generator.Element]? {
         if startIndex.distanceTo(range.startIndex) < 0 || endIndex.distanceTo(range.endIndex) > 0 { return nil }
         var deltas: [Generator.Element] = []
-        deltas.appendContentsOf(Repeat(count: ((startIndex..<range.startIndex).count as! Int), repeatedValue: delta - delta))
+        let zero = delta - delta
+        deltas.appendContentsOf(Repeat(count: ((startIndex..<range.startIndex).count as! Int), repeatedValue: zero))
         deltas.appendContentsOf(Repeat(count: ((range.startIndex..<range.endIndex).count as! Int), repeatedValue: delta))
-        deltas.appendContentsOf(Repeat(count: ((range.endIndex..<endIndex).count as! Int), repeatedValue: delta - delta))
+        deltas.appendContentsOf(Repeat(count: ((range.endIndex..<endIndex).count as! Int), repeatedValue: zero))
         var newNumbers: [Generator.Element] = []
         var deltasGen = deltas.generate()
         for number in self {
