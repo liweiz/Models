@@ -21,7 +21,11 @@ Find out all continuous non-zero-delta-to-reach-target ranges for current number
 
 max-deltas: in a continuous range, the max delta that all its members can be added in the progress of reaching each's target, but not over-reaching for any member.
 
-Written in Swift 2.2.
+### Notice
+
+Code is written in Swift 2.2 with Xcode 7.3.1.
+
+Due to my recent upgrade to macOS Sierra, the build is not able to run on simulators and real devices. Playground still works. Instead of unit tests, tests are done by running and printing at this moment.
 
 ### Lesson learned
 
