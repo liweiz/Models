@@ -39,25 +39,32 @@ let rangeD = 0..<0
 /// Range provided out of bounds of both base and in.
 /// Returns 'nil'.
 let range0 = rangeA.range(in: rangeA, for: 1000..<1001)
+print("range0: \(range0)")
 /// Range provided out of bounds of base.
 /// Returns 'nil'.
 let range1 = rangeA.range(in: rangeC, for: -9..<20)
+print("range1: \(range1)")
 /// Range provided out of bounds of in.
 /// Returns 'nil'.
 let range2 = rangeA.range(in: rangeC, for: 87..<90)
+print("range2: \(range2)")
 /// Range provided falls in both bounds of base and in.
 /// Returns '-76..<-69'.
 let range3 = rangeA.range(in: rangeC, for: 23..<30)
+print("range3: \(range3)")
 /// Empty range provided falls in both bounds of base and in.
 /// Empty base.
 /// Returns '0..<0'.
 let range4 = rangeD.range(in: rangeD, for: 0..<0)
+print("range4: \(range4)")
 /// Non-empty base.
 /// Returns '150..<150'.
 let range5 = rangeB.range(in: rangeB, for: 150..<150)
+print("range5: \(range5)")
 /// Empty range provided out of bounds of both base and in.
 /// Returns 'nil'.
 let range6 = rangeB.range(in: rangeB, for: 0..<0)
+print("range6: \(range6)")
 
 extension CollectionType where Generator.Element : IntegerArithmeticType, Generator.Element == SubSequence.Generator.Element {
     /// For each element in 'self', get the delta from the corresponding one in
@@ -168,49 +175,66 @@ let arrayH = [1, 32, 152, 44, 68, 8, 2]
 /// No-missing-element array pair with valid non-empty range.
 /// Returns '[-29, -140, -36, 7]'.
 let deltas0 = arrayA.deltas(from: arrayB)
+print("deltas0: \(deltas0)")
 /// No-missing-element array pair with valid empty range.
 /// Returns '[]'.
 let deltas1 = arrayA.deltas(from: arrayB, for: 0..<0)
+print("deltas1: \(deltas1)")
 
 /// No-missing-element array pair with out of bounds range.
 /// Returns 'nil'.
 let deltas2 = arrayA.deltas(from: arrayB, for: 0..<10)
+print("deltas2: \(deltas2)")
 /// Missing-element array pair with valid range.
 /// Returns 'nil'.
 let deltas3 = arrayA.deltas(from: arrayC, for: 0..<1)
+print("deltas3: \(deltas3)")
 
 /// No-missing-element array pair.
 /// Returns '[(Range(0..<3), -29), (Range(3..<4), 7)]'.
 let options0 = arrayA.nonZeroMaxDeltaRangesAndDeltas(from: arrayB)
+print("options0: \(options0)")
 /// Returns '[(Range(0..<3), 29), (Range(3..<4), -7)]'.
 let options1 = arrayB.nonZeroMaxDeltaRangesAndDeltas(from: arrayA)
+print("options1: \(options1)")
 /// Returns '[(Range(0..<2), -29), (Range(3..<4), -36), (Range(4..<5), 7)]'.
 let options2 = arrayE.nonZeroMaxDeltaRangesAndDeltas(from: arrayF)
+print("options2: \(options2)")
 /// Returns '[(Range(0..<2), 29), (Range(3..<4), 36), (Range(4..<5), -7)]'.
 let options3 = arrayF.nonZeroMaxDeltaRangesAndDeltas(from: arrayE)
+print("options3: \(options3)")
 /// Returns '[(Range(1..<3), -29), (Range(4..<5), -36), (Range(5..<6), 7)]'.
 let options4 = arrayG.nonZeroMaxDeltaRangesAndDeltas(from: arrayH)
+print("options4: \(options4)")
 /// Returns '[(Range(1..<3), 29), (Range(4..<5), 36), (Range(5..<6), -7)]'.
 let options5 = arrayH.nonZeroMaxDeltaRangesAndDeltas(from: arrayG)
+print("options5: \(options5)")
 /// Returns '[(Range(0..<1), 1), (Range(1..<2), -2), (Range(2..<4), 1), (Range(3..<4), -65)]'.
 let options6 = arrayA.nonZeroMaxDeltaRangesAndDeltas(from: arrayD)
+print("options6: \(options6)")
 
 /// Missing-element array pair.
 /// Returns 'nil'.
 let options7 = arrayA.nonZeroMaxDeltaRangesAndDeltas(from: arrayC)
+print("options7: \(options7)")
 
 /// Apply to valid range.
 /// Returns '[1, 82, 202, 94, 68, 8, 2]'.
 let applied0 = arrayH.apply(50, to: 1..<4)
+print("applied0: \(applied0)")
 /// Apply to invalid range.
 /// Returns 'nil'.
 let applied1 = arrayH.apply(50, to: 10..<40)
+print("applied1: \(applied1)")
 /// Returns 'nil'.
 let applied2 = arrayH.apply(50, to: 2..<8)
+print("applied2: \(applied2)")
 /// Returns '[1, 32, 202, 94, 118, 58, 52]'.
 let applied3 = arrayH.apply(50, to: 2..<7)
+print("applied3: \(applied3)")
 /// Returns 'nil'.
 let applied4 = arrayH.apply(50, to: -1..<7)
+print("applied4: \(applied4)")
 
 extension Array where Element : IntegerArithmeticType {
     /// Returns all deltas, ranges applied and new arrays generated to reach
@@ -254,15 +278,19 @@ let longerArray = [Int](count: 15, repeatedValue: 55)
 /// 'from' is shorter.
 /// Return 'nil'.
 let toTarget0 = normalTargetArray.deltasAndRangesWithNewArrays(from: shorterArray) { $0.first }
+print("toTarget0: \(toTarget0)")
 /// 'from' is longer.
 /// Return 'nil'.
 let toTarget1 = normalTargetArray.deltasAndRangesWithNewArrays(from: longerArray) { $0.first }
+print("toTarget1: \(toTarget1)")
 /// 'deltaPicker' not working properly.
 /// Return 'nil'.
 let toTarget2 = normalTargetArray.deltasAndRangesWithNewArrays(from: longerArray) { _ in return nil }
+print("toTarget2: \(toTarget2)")
 /// Normal.
 /// Returns '([41, 257, 409, -400, 1892, -21, 610, 10497, 1], [Range(0..<2), Range(1..<2), Range(3..<4), Range(4..<5), Range(6..<7), Range(7..<8), Range(8..<10), Range(8..<9), Range(11..<12)], [[42, 64, 53, 123, 412, 8, 231, 23, 1234, 43, 1, 3], [42, 321, 53, 123, 412, 8, 231, 23, 1234, 43, 1, 3], [42, 321, 53, 532, 412, 8, 231, 23, 1234, 43, 1, 3], [42, 321, 53, 532, 12, 8, 231, 23, 1234, 43, 1, 3], [42, 321, 53, 532, 12, 8, 2123, 23, 1234, 43, 1, 3], [42, 321, 53, 532, 12, 8, 2123, 2, 1234, 43, 1, 3], [42, 321, 53, 532, 12, 8, 2123, 2, 1844, 653, 1, 3], [42, 321, 53, 532, 12, 8, 2123, 2, 12341, 653, 1, 3], [42, 321, 53, 532, 12, 8, 2123, 2, 12341, 653, 1, 4]])'.
 let toTarget3 = normalTargetArray.deltasAndRangesWithNewArrays(from: normalInitialArray) { $0.first }
+print("toTarget3: \(toTarget3)")
 /// normalOutcome each step breakdown:
 /// step: 0
 /// newCollection: [1, 23, 53, 123, 412, 8, 231, 23, 1234, 43, 1, 3]
