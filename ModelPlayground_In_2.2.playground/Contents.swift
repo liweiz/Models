@@ -106,10 +106,8 @@ extension CollectionType where Generator.Element : IntegerArithmeticType, Genera
             tailIndex = i
             var newPieceReady = false
             let delta = deltasGen.next()
-            if i == endIndex {
-                if headIndex != nil { newPieceReady = true }
-            }
-            else {
+            if i == endIndex && headIndex != nil { newPieceReady = true }
+            if i != endIndex {
                 guard let deltaAtPosition = delta else {
                     fatalError("func nonZeroMaxDeltaRangesAndDeltas came up with invalid deltas.")
                 }
