@@ -212,7 +212,7 @@ extension CollectionType where Generator.Element : ControlledComparable, Generat
                 guard let deltaAtPosition = delta else {
                     fatalError("func nonZeroMaxDeltaRangesAndDeltas came up with invalid deltas.")
                 }
-                if deltaAtPosition.isEqual(to: zero) {
+                if !deltaAtPosition.isEqual(to: zero) {
                     if let _ = headIndex, deltaForRangeHere = deltaForRange {
                         if (deltaForRangeHere * deltaAtPosition).isLess(than: zero) { newPieceReady = true }
                     }
@@ -262,14 +262,14 @@ extension CollectionType where Generator.Element : ControlledComparable, Generat
     
 }
 
-let arrayA = [3, 12, 32, 15]
-let arrayB = [32, 152, 68, 8]
-let arrayC = [1]
-let arrayD = [2, 14, 31, 80]
-let arrayE = [3, 12, 44, 32, 15]
-let arrayF = [32, 152, 44, 68, 8]
-let arrayG = [1, 3, 12, 44, 32, 15, 2]
-let arrayH = [1, 32, 152, 44, 68, 8, 2]
+let arrayA: [Int] = [3, 12, 32, 15]
+let arrayB: [Int] = [32, 152, 68, 8]
+let arrayC: [Int] = [1]
+let arrayD: [Int] = [2, 14, 31, 80]
+let arrayE: [Int] = [3, 12, 44, 32, 15]
+let arrayF: [Int] = [32, 152, 44, 68, 8]
+let arrayG: [Int] = [1, 3, 12, 44, 32, 15, 2]
+let arrayH: [Int] = [1, 32, 152, 44, 68, 8, 2]
 
 /// No-missing-element array pair with valid non-empty range.
 /// Returns '[-29, -140, -36, 7]'.
@@ -350,6 +350,7 @@ extension Array where Element : ControlledComparable, Element: Arithmeticable {
         var numberOfOptions = nonZeroMaxDeltaRangesAndDeltas(from: collection)?.count ?? 0
         while numberOfOptions > 0 {
             if let options = nonZeroMaxDeltaRangesAndDeltas(from: newCollection) {
+                print("OPTIONS: \(options)")
                 numberOfOptions = options.count
                 if numberOfOptions > 0 {
                     guard let pick = deltaPicker(options)
@@ -430,60 +431,3 @@ print("toTarget3: \(toTarget3)")
 /// step: 9
 /// newCollection: [42, 321, 53, 532, 12, 8, 2123, 2, 12341, 653, 1, 4]
 /// options: []
-
-
-//protocol AccuracyTolerable: Numberable {
-//    func isEqual(to another: Self) -> Bool
-//    func isGreater(than another: Self) -> Bool
-//    func isLess(than aother: Self) -> Bool
-//}
-//
-//
-//extension AccuracyTolerable {
-//    /// Returns if 'self' == 'another'.
-//    @warn_unused_result
-//    func isEqual(to another: Self) -> Bool {
-//        switch another - self {
-//        case let delta as Double:
-//            return delta <= accuracy.forDoubleUpper && delta >= accuracy.forDoubleLower
-//        case let delta as Float:
-//            return delta <= accuracy.forFloatUpper && delta >= accuracy.forFloatLower
-//        case let delta as CGFloat:
-//            return delta <= accuracy.forCGFloatUpper && delta >= accuracy.forCGFloatLower
-//        default:
-//            fatalError("type is not implemented for AccuracyTolerable.")
-//        }
-//    }
-//    /// Returns if 'self' > self.
-//    @warn_unused_result
-//    func isGreater(than another: Self) -> Bool {
-//        switch self - another {
-//        case let delta as Double:
-//            return delta > accuracy.forDoubleUpper
-//        case let delta as Float:
-//            return delta > accuracy.forFloatUpper
-//        case let delta as CGFloat:
-//            return delta > accuracy.forCGFloatUpper
-//        default:
-//            fatalError("type is not implemented for AccuracyTolerable.")
-//        }
-//    }
-//    /// Returns if 'self' < 'another'.
-//    @warn_unused_result
-//    func isLess(than another: Self) -> Bool {
-//        switch self - another {
-//        case let delta as Double:
-//            return delta < accuracy.forDoubleLower
-//        case let delta as Float:
-//            return delta < accuracy.forFloatLower
-//        case let delta as CGFloat:
-//            return delta < accuracy.forCGFloatLower
-//        default:
-//            fatalError("type is not implemented for AccuracyTolerable.")
-//        }
-//    }
-//}
-//
-//extension Double: AccuracyTolerable {}
-//extension Float: AccuracyTolerable {}
-//extension CGFloat: AccuracyTolerable {}
