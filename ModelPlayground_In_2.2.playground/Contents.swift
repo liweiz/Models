@@ -1,7 +1,5 @@
 /// Written in Swift 2.2.
 
-import UIKit
-
 extension Range {
     /// Returns the corresponding positions of start and end indice of
     /// 'rangeInSelf' in 'anotherRange'.
@@ -66,7 +64,110 @@ print("range5: \(range5)")
 let range6 = rangeB.range(in: rangeB, for: 0..<0)
 print("range6: \(range6)")
 
-extension CollectionType where Generator.Element : IntegerArithmeticType, Generator.Element == SubSequence.Generator.Element {
+
+protocol Arithmeticable {
+    func +(_: Self, _: Self) -> Self
+    func -(_: Self, _: Self) -> Self
+    func *(_: Self, _: Self) -> Self
+    func /(_: Self, _: Self) -> Self
+}
+
+extension Int: Arithmeticable {}
+extension Int8: Arithmeticable {}
+extension Int16: Arithmeticable {}
+extension Int32: Arithmeticable {}
+extension Int64: Arithmeticable {}
+extension UInt: Arithmeticable {}
+extension UInt8: Arithmeticable {}
+extension UInt16: Arithmeticable {}
+extension UInt32: Arithmeticable {}
+extension UInt64: Arithmeticable {}
+
+extension Double: Arithmeticable {}
+extension Float: Arithmeticable {}
+
+
+protocol ControlledComparable {
+    func isEqual(to another: Self) -> Bool
+    func isGreater(than another: Self) -> Bool
+    func isLess(than another: Self) -> Bool
+}
+
+extension IntegerArithmeticType {
+    @warn_unused_result
+    func isEqual(to another: Self) -> Bool {
+        return self == another
+    }
+    @warn_unused_result
+    func isGreater(than another: Self) -> Bool {
+        return self > another
+    }
+    @warn_unused_result
+    func isLess(than another: Self) -> Bool {
+        return self < another
+    }
+}
+
+extension Int: ControlledComparable {}
+extension Int8: ControlledComparable {}
+extension Int16: ControlledComparable {}
+extension Int32: ControlledComparable {}
+extension Int64: ControlledComparable {}
+extension UInt: ControlledComparable {}
+extension UInt8: ControlledComparable {}
+extension UInt16: ControlledComparable {}
+extension UInt32: ControlledComparable {}
+extension UInt64: ControlledComparable {}
+
+let accuracyPctInDouble: Double = 0.001 * 0.01
+
+extension Double {
+    @warn_unused_result
+    func isEqual(to another: Double) -> Bool {
+        return self > another * (1 - accuracyPctInDouble) && self < another * (1 + accuracyPctInDouble)
+    }
+    @warn_unused_result
+    func isGreater(than another: Double) -> Bool {
+        return self >= another * (1 + accuracyPctInDouble)
+    }
+    @warn_unused_result
+    func isLess(than another: Double) -> Bool {
+        return self <= another * (1 - accuracyPctInDouble)
+    }
+}
+
+extension Double: ControlledComparable {}
+
+let accuracyPctInFloat: Float = 0.001 * 0.01
+
+extension Float {
+    @warn_unused_result
+    func isEqual(to another: Float) -> Bool {
+        return self > another * (1 - accuracyPctInFloat) && self < another * (1 + accuracyPctInFloat)
+    }
+    @warn_unused_result
+    func isGreater(than another: Float) -> Bool {
+        return self >= another * (1 + accuracyPctInFloat)
+    }
+    @warn_unused_result
+    func isLess(than another: Float) -> Bool {
+        return self <= another * (1 - accuracyPctInFloat)
+    }
+}
+
+extension Float: ControlledComparable {}
+
+func min<T : ControlledComparable>(x: T, _ y: T) -> T {
+    if x.isGreater(than: y) { return y }
+    return x
+}
+
+func max<T : ControlledComparable>(x: T, _ y: T) -> T {
+    if x.isLess(than: y) { return y }
+    return x
+}
+
+extension CollectionType where Generator.Element : ControlledComparable, Generator.Element : Arithmeticable, Generator.Element == SubSequence.Generator.Element {
     /// For each element in 'self', get the delta from the corresponding one in
     /// 'from' and return as an 'Array'.
     /// Returns 'nil', if any elemnt in either arrays is missing.
@@ -111,15 +212,15 @@ extension CollectionType where Generator.Element : IntegerArithmeticType, Genera
                 guard let deltaAtPosition = delta else {
                     fatalError("func nonZeroMaxDeltaRangesAndDeltas came up with invalid deltas.")
                 }
-                if deltaAtPosition != zero {
+                if deltaAtPosition.isEqual(to: zero) {
                     if let _ = headIndex, deltaForRangeHere = deltaForRange {
-                        if deltaForRangeHere * deltaAtPosition < zero { newPieceReady = true }
+                        if (deltaForRangeHere * deltaAtPosition).isLess(than: zero) { newPieceReady = true }
                     }
                     else {
                         headIndex = i
                     }
                     if !newPieceReady {
-                        deltaForRange = (deltaForRange == nil) ? deltaAtPosition : (deltaAtPosition > zero ? min(deltaForRange!, deltaAtPosition) : max(deltaForRange!, deltaAtPosition))
+                        deltaForRange = (deltaForRange == nil) ? deltaAtPosition : (deltaAtPosition.isGreater(than: zero) ? min(deltaForRange!, deltaAtPosition) : max(deltaForRange!, deltaAtPosition))
                     }
                 }
                 else {
@@ -133,7 +234,7 @@ extension CollectionType where Generator.Element : IntegerArithmeticType, Genera
                 headIndex = nil
                 tailIndex = nil
                 deltaForRange = nil
-                if delta != nil && delta! != zero {
+                if delta != nil && !delta!.isEqual(to: zero) {
                     headIndex = i
                     deltaForRange = delta
                 }
@@ -234,7 +335,7 @@ print("applied3: \(applied3)")
 let applied4 = arrayH.apply(50, to: -1..<7)
 print("applied4: \(applied4)")
 
-extension Array where Element : IntegerArithmeticType {
+extension Array where Element : ControlledComparable, Element: Arithmeticable {
     /// Returns all deltas, ranges applied and new arrays generated to reach
     /// self.
     /// Returns 'nil', if there is no corresponding element in either array or
@@ -337,22 +438,6 @@ print("toTarget3: \(toTarget3)")
 //    func isLess(than aother: Self) -> Bool
 //}
 //
-//struct AccuracyTolerance {
-//    let forDoubleUpper: Double
-//    let forDoubleLower: Double
-//    let forFloatUpper: Float
-//    let forFloatLower: Float
-//    let forCGFloatUpper: CGFloat
-//    let forCGFloatLower: CGFloat
-//}
-//
-//let accuracy = AccuracyTolerance(
-//    forDoubleUpper: 0.000001,
-//    forDoubleLower: -0.000001,
-//    forFloatUpper: 0.000001,
-//    forFloatLower: -0.000001,
-//    forCGFloatUpper: 0.000001,
-//    forCGFloatLower: -0.000001)
 //
 //extension AccuracyTolerable {
 //    /// Returns if 'self' == 'another'.
