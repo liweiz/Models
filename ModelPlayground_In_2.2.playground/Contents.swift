@@ -34,21 +34,21 @@ let rangeB = 50..<1000
 let rangeC = -99..<(-60)
 let rangeD = 0..<0
 
-struct Test_Ext_Range_Range {
-    let testName: String,
-    selfRange: Range<Int>,
-    anotherRange: Range<Int>,
-    expectedOutcome: Range<Int>?
-    func test_Ext_Range_Range() -> Bool {
-        
-    }
-}
-
-
-
-let tests_Ext_Range_Range = [
-    Test_Ext_Range_Range(testName: "Range provided out of bounds of both base and in.", selfRange: rangeA, anotherRange: rangeB, expectedOutcome: nil)
-]
+//struct Test_Ext_Range_Range {
+//    let testName: String,
+//    selfRange: Range<Int>,
+//    anotherRange: Range<Int>,
+//    expectedOutcome: Range<Int>?
+//    func test_Ext_Range_Range() -> Bool {
+//        
+//    }
+//}
+//
+//
+//
+//let tests_Ext_Range_Range = [
+//    Test_Ext_Range_Range(testName: "Range provided out of bounds of both base and in.", selfRange: rangeA, anotherRange: rangeB, expectedOutcome: nil)
+//]
 
 
 
