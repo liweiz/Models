@@ -34,6 +34,24 @@ let rangeB = 50..<1000
 let rangeC = -99..<(-60)
 let rangeD = 0..<0
 
+struct Test_Ext_Range_Range {
+    let testName: String,
+    selfRange: Range<Int>,
+    anotherRange: Range<Int>,
+    expectedOutcome: Range<Int>?
+    func test_Ext_Range_Range() -> Bool {
+        
+    }
+}
+
+
+
+let tests_Ext_Range_Range = [
+    Test_Ext_Range_Range(testName: "Range provided out of bounds of both base and in.", selfRange: rangeA, anotherRange: rangeB, expectedOutcome: nil)
+]
+
+
+
 /// Range provided out of bounds of both base and in.
 /// Returns 'nil'.
 let range0 = rangeA.range(in: rangeA, for: 1000..<1001)
@@ -275,6 +293,7 @@ let arrayH: [Int] = [1, 32, 152, 44, 68, 8, 2]
 /// Returns '[-29, -140, -36, 7]'.
 let deltas0 = arrayA.deltas(from: arrayB)
 print("deltas0: \(deltas0)")
+
 /// No-missing-element array pair with valid empty range.
 /// Returns '[]'.
 let deltas1 = arrayA.deltas(from: arrayB, for: 0..<0)

@@ -9,11 +9,11 @@ Given a list of numbers and another list of new value for each number. Each time
 
 >[1, 6, 4, 2] => [0, 2, -1, 4]
 
->Step0: delta = -1, range = 0..<1
+>Step0: delta = -1, range = 0..<3
 
->After Step0: [0, 6, 4, 2]
+>After Step0: [0, 5, 3, 2]
 
->Step1: delta = -4, range = 1..<3
+>Step1: delta = -3, range = 1..<3
 
 >After Step1: [0, 2, 0, 2]
 
