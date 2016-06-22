@@ -34,23 +34,46 @@ let rangeB = 50..<1000
 let rangeC = -99..<(-60)
 let rangeD = 0..<0
 
-//struct Test_Ext_Range_Range {
-//    let testName: String,
-//    selfRange: Range<Int>,
-//    anotherRange: Range<Int>,
-//    expectedOutcome: Range<Int>?
-//    func test_Ext_Range_Range() -> Bool {
-//        
-//    }
-//}
-//
-//
-//
-//let tests_Ext_Range_Range = [
-//    Test_Ext_Range_Range(testName: "Range provided out of bounds of both base and in.", selfRange: rangeA, anotherRange: rangeB, expectedOutcome: nil)
-//]
+struct Test_Ext_Range_Range {
+    let testName: String,
+    selfRange: Range<Int>,
+    anotherRange: Range<Int>,
+    rangeInSelf: Range<Int>,
+    expectedOutcome: Range<Int>?
+    func test() -> Bool {
+        if let outcome = selfRange.range(in: anotherRange, for: rangeInSelf) {
+            if let out = expectedOutcome {
+                return outcome == out
+            }
+        }
+        else if expectedOutcome == nil {
+            return true
+        }
+        return false
+    }
+}
 
+let tests_Ext_Range_Range = [
+    Test_Ext_Range_Range(testName: "Range provided out of bounds of both base and in.", selfRange: rangeA, anotherRange: rangeB, rangeInSelf: 1000..<1001, expectedOutcome: nil),
+    Test_Ext_Range_Range(testName: "Range provided out of bounds of base.", selfRange: rangeA, anotherRange: rangeC, rangeInSelf: -9..<20, expectedOutcome: nil),
+    Test_Ext_Range_Range(testName: "Range provided out of bounds of in.", selfRange: rangeA, anotherRange: rangeC, rangeInSelf: 87..<90, expectedOutcome: nil),
+    Test_Ext_Range_Range(testName: "Range provided falls in both bounds of base and in.", selfRange: rangeA, anotherRange: rangeC, rangeInSelf: 23..<30, expectedOutcome: -76..<(-69)),
+    Test_Ext_Range_Range(testName: "Empty range provided falls in both bounds of base and in.", selfRange: rangeD, anotherRange: rangeD, rangeInSelf: 0..<0, expectedOutcome: 0..<0),
+    Test_Ext_Range_Range(testName: "Non-empty base.", selfRange: rangeB, anotherRange: rangeB, rangeInSelf: 150..<150, expectedOutcome: 150..<150),
+    Test_Ext_Range_Range(testName: "Empty range provided out of bounds of both base and in.", selfRange: rangeB, anotherRange: rangeB, rangeInSelf: 0..<0, expectedOutcome: nil)
+]
 
+func test_tests_Ext_Range_Range() {
+    print("Test START: tests_Ext_Range_Range")
+    for t in tests_Ext_Range_Range {
+        print("test: \(t.testName) => START")
+        assert(t.test())
+        print("test: \(t.testName) => END")
+    }
+    print("Test END: tests_Ext_Range_Range")
+}
+
+test_tests_Ext_Range_Range()
 
 /// Range provided out of bounds of both base and in.
 /// Returns 'nil'.
