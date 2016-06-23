@@ -165,36 +165,38 @@ let accuracyPctInDouble: Double = 0.001 * 0.01
 extension Double {
     @warn_unused_result
     func isEqual(to another: Double) -> Bool {
-        return self > another * (1 - accuracyPctInDouble) && self < another * (1 + accuracyPctInDouble)
+        return self - another > -accuracyPctInDouble && self - another < accuracyPctInDouble
     }
     @warn_unused_result
     func isGreater(than another: Double) -> Bool {
-        return self >= another * (1 + accuracyPctInDouble)
+        return self - another >= accuracyPctInDouble
     }
     @warn_unused_result
     func isLess(than another: Double) -> Bool {
-        return self <= another * (1 - accuracyPctInDouble)
+        return self - another <= -accuracyPctInDouble
     }
 }
 
 extension Double: ControlledComparable {}
 
-let accuracyPctInFloat: Float = 0.001 * 0.01
+let accuracyPctInFloat: Float = 0.0001
 
 extension Float {
     @warn_unused_result
     func isEqual(to another: Float) -> Bool {
-        return self > another * (1 - accuracyPctInFloat) && self < another * (1 + accuracyPctInFloat)
+        return self - another > -accuracyPctInFloat && self - another < accuracyPctInFloat
     }
     @warn_unused_result
     func isGreater(than another: Float) -> Bool {
-        return self >= another * (1 + accuracyPctInFloat)
+        return self - another >= accuracyPctInFloat
     }
     @warn_unused_result
     func isLess(than another: Float) -> Bool {
-        return self <= another * (1 - accuracyPctInFloat)
+        return self - another <= -accuracyPctInFloat
     }
 }
+
+Float(0.000001).isEqual(to: Float(0))
 
 extension Float: ControlledComparable {}
 
@@ -311,6 +313,94 @@ let arrayE: [Int] = [3, 12, 44, 32, 15]
 let arrayF: [Int] = [32, 152, 44, 68, 8]
 let arrayG: [Int] = [1, 3, 12, 44, 32, 15, 2]
 let arrayH: [Int] = [1, 32, 152, 44, 68, 8, 2]
+
+struct Test_Ext_Collection_Deltas_Int {
+    let testName: String,
+    collection: Array<Int>,
+    fromCollection: Array<Int>,
+    forRange: Range<Int>,
+    expectedOutcome: Array<Int>?
+    func test() -> Bool {
+        if let outcome = collection.deltas(from: fromCollection, for: forRange) {
+            if let out = expectedOutcome {
+                return outcome == out
+            }
+        }
+        else if expectedOutcome == nil {
+            return true
+        }
+        return false
+    }
+}
+
+let tests_Ext_Collection_Deltas_Int = [
+    Test_Ext_Collection_Deltas_Int(testName: "No-missing-element array pair with valid non-empty range.", collection: arrayA, fromCollection: arrayB, forRange: arrayA.indices, expectedOutcome: [-29, -140, -36, 7]),
+    Test_Ext_Collection_Deltas_Int(testName: "No-missing-element array pair with valid empty range.", collection: arrayA, fromCollection: arrayB, forRange: 0..<0, expectedOutcome: []),
+    Test_Ext_Collection_Deltas_Int(testName: "No-missing-element array pair with out of bounds range.", collection: arrayA, fromCollection: arrayB, forRange: 0..<10, expectedOutcome: nil),
+    Test_Ext_Collection_Deltas_Int(testName: "Missing-element array pair with valid range.", collection: arrayA, fromCollection: arrayC, forRange: 0..<1, expectedOutcome: nil)
+]
+
+func test_tests_Ext_Collection_Deltas_Int() {
+    print("Test START: tests_Ext_Collection_Deltas_Int")
+    for t in tests_Ext_Collection_Deltas_Int {
+        print("test: \(t.testName) => START")
+        assert(t.test())
+        print("test: \(t.testName) => END")
+    }
+    print("Test END: tests_Ext_Collection_Deltas_Int")
+}
+
+test_tests_Ext_Collection_Deltas_Int()
+
+func ==(lhs: [Float], rhs: [Float]) -> Bool {
+    if lhs.count != rhs.count { return false }
+    for i in lhs.indices {
+        if !lhs[i].isEqual(to: rhs[i]) { return false }
+    }
+    return true
+}
+
+let arrayFloatA: [Float] = [0.0000001, 0]
+let arrayFloatB: [Float] = [0, 0.0000001]
+let arrayFloatC: [Float] = [0.001, 0.0009, 0.0009001, 0.0011, 0.00101]
+let arrayFloatD: [Float] = [0.001, 0.001, 0.001, 0.001, 0.001]
+
+struct Test_Ext_Collection_Deltas_Float {
+    let testName: String,
+    collection: Array<Float>,
+    fromCollection: Array<Float>,
+    forRange: Range<Int>,
+    expectedOutcome: Array<Float>?
+    func test() -> Bool {
+        if let outcome = collection.deltas(from: fromCollection, for: forRange) {
+            print(outcome)
+            if let out = expectedOutcome {
+                return outcome == out
+            }
+        }
+        else if expectedOutcome == nil {
+            return true
+        }
+        return false
+    }
+}
+
+let tests_Ext_Collection_Deltas_Float = [
+    Test_Ext_Collection_Deltas_Float(testName: "No-missing-element array pair with valid non-empty range.", collection: arrayFloatA, fromCollection: arrayFloatB, forRange: arrayFloatA.indices, expectedOutcome: [0, 0]),
+    Test_Ext_Collection_Deltas_Float(testName: "No-missing-element array pair with valid non-empty range. Tests on all boundaries.", collection: arrayFloatC, fromCollection: arrayFloatD, forRange: arrayFloatC.indices, expectedOutcome: [0, -0.0001, 0, 0.0001, 0])
+]
+
+func test_tests_Ext_Collection_Deltas_Float() {
+    print("Test START: tests_Ext_Collection_Deltas_Float")
+    for t in tests_Ext_Collection_Deltas_Float {
+        print("test: \(t.testName) => START")
+        assert(t.test())
+        print("test: \(t.testName) => END")
+    }
+    print("Test END: tests_Ext_Collection_Deltas_Float")
+}
+
+test_tests_Ext_Collection_Deltas_Float()
 
 /// No-missing-element array pair with valid non-empty range.
 /// Returns '[-29, -140, -36, 7]'.
