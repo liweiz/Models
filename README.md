@@ -41,6 +41,10 @@ Find out all continuous non-zero-delta-to-reach-target ranges for current number
 
 max-deltas: in a continuous range, the max delta that all its members can be added in the progress of reaching each's target, but not over-reaching for any member.
 
+### Why Generics
+
+I want to explore generics a bit with real problem I'm facing. So yes, this can be solved easily with just non-generic way. But how to make it as generic as I can also interests me.
+
 ### Notice
 
 Code is written in Swift 2.2 with Xcode 7.3.1.
@@ -49,4 +53,4 @@ Due to my recent upgrade to macOS Sierra, the build is not able to run on simula
 
 ### Lesson learned
 
-Avoiding operating on nested data structures, which could lead to unnecessary complexity while working with extension.
+Avoiding operating on nested data structures, which could lead to unnecessary complexity while working with extensions.
