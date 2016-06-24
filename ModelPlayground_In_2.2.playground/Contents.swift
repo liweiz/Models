@@ -196,8 +196,6 @@ extension Float {
     }
 }
 
-Float(0.000001).isEqual(to: Float(0))
-
 extension Float: ControlledComparable {}
 
 func min<T : ControlledComparable>(x: T, _ y: T) -> T {
@@ -387,7 +385,11 @@ struct Test_Ext_Collection_Deltas_Float {
 
 let tests_Ext_Collection_Deltas_Float = [
     Test_Ext_Collection_Deltas_Float(testName: "No-missing-element array pair with valid non-empty range.", collection: arrayFloatA, fromCollection: arrayFloatB, forRange: arrayFloatA.indices, expectedOutcome: [0, 0]),
-    Test_Ext_Collection_Deltas_Float(testName: "No-missing-element array pair with valid non-empty range. Tests on all boundaries.", collection: arrayFloatC, fromCollection: arrayFloatD, forRange: arrayFloatC.indices, expectedOutcome: [0, -0.0001, 0, 0.0001, 0])
+    Test_Ext_Collection_Deltas_Float(testName: "No-missing-element array pair with valid non-empty range. Tests on all boundaries.", collection: arrayFloatC, fromCollection: arrayFloatD, forRange: arrayFloatC.indices, expectedOutcome: [0, -0.0001, 0, 0.0001, 0]),
+    Test_Ext_Collection_Deltas_Float(testName: "No-missing-element array pair with valid empty range.", collection: arrayFloatC, fromCollection: arrayFloatD, forRange: 0..<0, expectedOutcome: []),
+    Test_Ext_Collection_Deltas_Float(testName: "No-missing-element array pair with out of bounds range.", collection: arrayFloatC, fromCollection: arrayFloatD, forRange: 0..<10, expectedOutcome: nil),
+    Test_Ext_Collection_Deltas_Float(testName: "No-missing-element array pair with out of bounds empty range.", collection: arrayFloatC, fromCollection: arrayFloatD, forRange: 10..<10, expectedOutcome: nil),
+    Test_Ext_Collection_Deltas_Float(testName: "Missing-element array pair with valid range.", collection: arrayFloatC, fromCollection: arrayFloatA, forRange: 0..<1, expectedOutcome: nil)
 ]
 
 func test_tests_Ext_Collection_Deltas_Float() {
