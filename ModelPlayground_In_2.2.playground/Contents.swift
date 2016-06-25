@@ -237,6 +237,7 @@ extension CollectionType where Generator.Element : ControlledComparable, Generat
     @warn_unused_result
     func nonZeroMaxDeltaRangesAndDeltas<T : CollectionType where T.Generator.Element == Self.Generator.Element, T.Generator.Element == T.SubSequence.Generator.Element>(from collection: T) -> [(Range<Index>, Generator.Element)]? {
         guard let deltas = deltas(from: collection) else { return nil }
+        print("deltas: \(deltas)")
         var results: [(Range<Index>, Generator.Element)] = []
         if deltas.count == 0 { return results }
         let zero = deltas.first! - deltas.first!
@@ -403,6 +404,59 @@ func test_tests_Ext_Collection_Deltas_Float() {
 }
 
 test_tests_Ext_Collection_Deltas_Float()
+
+let arrayFloatE: [Float] = [0.001, 0.0009, 0.0009001, 0.0012, 0.00101]
+let arrayFloatF: [Float] = [0.001, 0.001, 0.001, 0.001, 0.001]
+let arrayFloatG: [Float] = [1, -1, -0.9, 0.3, 2]
+
+func ==(lhs: [(Range<Int>, Float)], rhs: [(Range<Int>, Float)]) -> Bool {
+    if lhs.count == rhs.count {
+        for i in lhs.indices {
+            let l = lhs[i]
+            let r = rhs[i]
+            if l.0 != r.0 { return false }
+            if !l.1.isEqual(to: r.1) { return false }
+        }
+        return true
+    }
+    return false
+}
+
+struct Test_Ext_Collection_nonZeroMaxDeltaRangesAndDeltas_Float {
+    let testName: String
+    let collection: Array<Float>
+    let fromCollection: Array<Float>
+    let expectedOutcome: [(Range<Int>, Float)]?
+    func test() -> Bool {
+        if let outcome = collection.nonZeroMaxDeltaRangesAndDeltas(from: fromCollection) {
+            print(outcome)
+            if let out = expectedOutcome {
+                return outcome == out
+            }
+        }
+        else if expectedOutcome == nil {
+            return true
+        }
+        return false
+    }
+}
+
+let tests_Ext_Collection_nonZeroMaxDeltaRangesAndDeltas_Float = [
+    Test_Ext_Collection_nonZeroMaxDeltaRangesAndDeltas_Float(testName: "No-missing-element array pair.", collection: arrayFloatE, fromCollection: arrayFloatF, expectedOutcome: [(1..<2, -0.0001), (3..<4, 0.0002)]),
+    Test_Ext_Collection_nonZeroMaxDeltaRangesAndDeltas_Float(testName: "No-missing-element array pair.", collection: arrayFloatG, fromCollection: arrayFloatF, expectedOutcome: [(0..<1, 0.999), (1..<3, -0.901), (3..<5, 0.299)])
+]
+
+func test_tests_Ext_Collection_nonZeroMaxDeltaRangesAndDeltas_Float() {
+    print("Test START: tests_Ext_Collection_nonZeroMaxDeltaRangesAndDeltas_Float")
+    for t in tests_Ext_Collection_nonZeroMaxDeltaRangesAndDeltas_Float {
+        print("test: \(t.testName) => START")
+        assert(t.test())
+        print("test: \(t.testName) => END")
+    }
+    print("Test END: tests_Ext_Collection_nonZeroMaxDeltaRangesAndDeltas_Float")
+}
+
+test_tests_Ext_Collection_nonZeroMaxDeltaRangesAndDeltas_Float()
 
 /// No-missing-element array pair with valid non-empty range.
 /// Returns '[-29, -140, -36, 7]'.
