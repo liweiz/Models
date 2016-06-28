@@ -529,13 +529,13 @@ extension Array where Element : ControlledComparable, Element: Arithmeticable {
     /// Returns 'nil', if there is no corresponding element in either array or
     /// 'deltaPicker' fails to pick.
     @warn_unused_result
-    func deltasAndRangesWithNewArrays(from collection: [Element], @noescape deltaPicker: ([(Range<Int>, Element)]) -> (Range<Int>, Element)?) -> (deltas: [Generator.Element], ranges: [Range<Int>], newArrays: [[Element]])? {
-        if count != collection.count { return nil }
+    func deltasAndRangesWithNewArrays(from array: [Element], @noescape deltaPicker: ([(Range<Int>, Element)]) -> (Range<Int>, Element)?) -> (deltas: [Generator.Element], ranges: [Range<Int>], newArrays: [[Element]])? {
+        if count != array.count { return nil }
         var deltas: [Generator.Element] = []
         var ranges: [Range<Int>] = []
         var newArrays: [[Element]] = []
-        var newCollection = collection
-        var numberOfOptions = nonZeroMaxDeltaRangesAndDeltas(from: collection)?.count ?? 0
+        var newCollection = array
+        var numberOfOptions = nonZeroMaxDeltaRangesAndDeltas(from: array)?.count ?? 0
         while numberOfOptions > 0 {
             if let options = nonZeroMaxDeltaRangesAndDeltas(from: newCollection) {
                 print("OPTIONS: \(options)")
@@ -545,7 +545,7 @@ extension Array where Element : ControlledComparable, Element: Arithmeticable {
                         else { return nil }
                     deltas.append(pick.1)
                     ranges.append(pick.0)
-                    newCollection = (newArrays.last ?? collection).apply(pick.1, to: pick.0)!
+                    newCollection = (newArrays.last ?? array).apply(pick.1, to: pick.0)!
                     newArrays.append(newCollection)
                 }
             }
@@ -556,6 +556,41 @@ extension Array where Element : ControlledComparable, Element: Arithmeticable {
         return (deltas, ranges, newArrays)
     }
 }
+
+func ==(lhs: [[Float]], rhs: [[Float]]) -> Bool {
+    if lhs.count == rhs.count {
+        for i in lhs.indices {
+            if !(lhs[i] == rhs[i]) {
+                return false
+            }
+        }
+        return true
+    }
+    return false
+}
+
+struct Test_Ext_Array_deltasAndRangesWithNewArrays_Float {
+    let testName: String
+    let array: Array<Float>
+    let fromArray: Array<Float>
+    let deltaPicker: ([(Range<Int>, Float)]) -> (Range<Int>, Float)?
+    let expectedOutcome: (deltas: [Float], ranges: [Range<Int>], newArrays: [[Float]])?
+    func test() -> Bool {
+        if let outcome = array.deltasAndRangesWithNewArrays(from: fromArray, deltaPicker: deltaPicker) {
+            print(outcome)
+            if let out = expectedOutcome {
+                return outcome.deltas == out.deltas && outcome.ranges == out.ranges && outcome.newArrays == out.newArrays
+            }
+        }
+        else if expectedOutcome == nil {
+            return true
+        }
+        return false
+    }
+}
+
+let normalTargetArrayFloat: [Float] = [0.00042, 0.00321, 0.00053, 0.00012, 0.00008, 0.02123, 0.00002, 0.12341, 0.00653, 0.00001]
+let normalInitialArrayFloat: [Float] = [0.00001, 0.00023, 0.00053, 0.00123, 0.00412, 0.00008, 0.00231, 0.00023, 0.01234, 0.00043, 0.00001, 0.00003]
 
 let normalTargetArray = [42, 321, 53, 532, 12, 8, 2123, 2, 12341, 653, 1, 4]
 let normalInitialArray = [1, 23, 53, 123, 412, 8, 231, 23, 1234, 43, 1, 3]
